@@ -34,7 +34,7 @@ Manage your WBFS files easily and intuitively!
 
 ## 🤝 Contribution
 
-Contributions are welcome! If you'd like to help, open a pull request or report an issue in the Issues Tab [GitHub Pages](https://github.com/OxyZin/WBFS-Utility/issues).
+Contributions are welcome! If you'd like to help, open a pull request or report an issue in the [Issues Tab](https://github.com/OxyZin/WBFS-Utility/issues).
 
 ## 📧 Contact
 
