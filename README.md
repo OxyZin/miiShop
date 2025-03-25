@@ -1,37 +1,19 @@
-# miiShop
-
 <p align="center">
   <img src="https://raw.githubusercontent.com/OxyZin/miiShopDatabase/refs/heads/main/miishop.png" alt="miiShop">
 </p>
 
-## Sobre
-O **miiShop** é um projeto inspirado na hShop, mas desenvolvido para o Nintendo Wii. Ele permite baixar arquivos diretamente no console, facilitando a instalação de conteúdos adicionais.
+## About  
+**miiShop** is a project inspired by hShop but developed for the Nintendo Wii. It allows direct file downloads on the console, making it easier to install additional content.  
 
-## Funcionalidades
-- Download direto para o Wii
-- Suporte para diferentes categorias de arquivos
-- Interface simples e intuitiva
+## Features  
+- Direct download to the Wii  
+- Support for different file categories  
+- Simple and intuitive interface  
 
-## Estrutura do Projeto
-O projeto está organizado da seguinte maneira:
-```
-/miiShop
-│-- /Source
-│   │-- main.c
-│   │-- USBsubmenu.c
-│   │-- WIIsubmenu.c
-│   │-- HBCsubmenu.c
-│-- /Assets
-│-- /Database
-```
+## How to Use  
+1. Install **miiShop** on your SD card or HDD.  
+2. Insert it into your Nintendo Wii.  
+3. Run the application via the Homebrew Channel.  
 
-## Como Usar
-1. Instale o **miiShop** no seu cartão SD.
-2. Insira o cartão no seu Nintendo Wii.
-3. Execute o aplicativo pelo Homebrew Channel.
-
-## Contribuição
-Se você deseja contribuir, sinta-se à vontade para abrir issues ou pull requests no repositório.
-
-## Licença
-Este projeto é distribuído sob a licença MIT. Veja o arquivo `LICENSE` para mais detalhes.
+## Contribution  
+If you would like to contribute, feel free to open issues or pull requests in the repository.
