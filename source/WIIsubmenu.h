@@ -1,6 +1,6 @@
-#ifndef WIISUBMENU_H
-#define WIISUBMENU_H
+#ifndef WII_SUBMENU_H
+#define WII_SUBMENU_H
 
-void abrirWIIsubmenu();
+void abrirWIIsubmenu(void);
 
 #endif

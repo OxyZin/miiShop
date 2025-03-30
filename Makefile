@@ -19,7 +19,7 @@ TARGET      := $(notdir $(CURDIR))
 BUILD       := build
 SOURCES     := Source
 DATA        := data
-INCLUDES    := $(DEVKITPRO)/libogc/include
+INCLUDES    := Source  # Apenas o diretório Source, libogc é incluído via wii_rules
 
 #---------------------------------------------------------------------------------
 # options for code generation
@@ -31,15 +31,15 @@ LDFLAGS     = -g $(MACHDEP) -Wl,-Map,$(notdir $@).map
 #---------------------------------------------------------------------------------
 # any extra libraries we wish to link with the project
 #---------------------------------------------------------------------------------
-LIBS := -lwiiuse -lbte -lfat -logc -lm  # Remova o -lusb daqui
+LIBS        := -lwiiuse -lbte -lfat -logc -lm  # Removido -lnetwork
+
 #---------------------------------------------------------------------------------
-# list of directories containing libraries, this must be the top level containing
-# include and lib
+# list of directories containing libraries
 #---------------------------------------------------------------------------------
-LIBPATHS := -L$(LIBOGC_LIB) $(foreach dir,$(LIBDIRS),-L$(dir)/lib)
+LIBPATHS    := -L$(LIBOGC_LIB) $(foreach dir,$(LIBDIRS),-L$(dir)/lib)
+
 #---------------------------------------------------------------------------------
-# no real need to edit anything past this point unless you need to add additional
-# rules for different file extensions
+# no real need to edit anything past this point unless adding new file types
 #---------------------------------------------------------------------------------
 ifneq ($(BUILD),$(notdir $(CURDIR)))
 #---------------------------------------------------------------------------------
@@ -76,17 +76,16 @@ export HFILES         := $(addsuffix .h,$(subst .,_,$(BINFILES)))
 #---------------------------------------------------------------------------------
 # build a list of include paths
 #---------------------------------------------------------------------------------
-export INCLUDE    := $(foreach dir,$(INCLUDES), -iquote $(CURDIR)/$(dir)) \
-                    $(foreach dir,$(LIBDIRS),-I$(dir)/include) \
+export INCLUDE    := $(foreach dir,$(INCLUDES),-I$(CURDIR)/$(dir)) \
                     -I$(CURDIR)/$(BUILD) \
                     -I$(LIBOGC_INC)
 
 #---------------------------------------------------------------------------------
 # build a list of library paths
 #---------------------------------------------------------------------------------
-export LIBPATHS := -L$(LIBOGC_LIB) $(foreach dir,$(LIBDIRS),-L$(dir)/lib)
+export LIBPATHS   := -L$(LIBOGC_LIB) $(foreach dir,$(LIBDIRS),-L$(dir)/lib)
 
-export OUTPUT := $(CURDIR)/$(TARGET)
+export OUTPUT     := $(CURDIR)/$(TARGET)
 .PHONY: $(BUILD) clean
 
 #---------------------------------------------------------------------------------
@@ -120,7 +119,6 @@ $(OFILES_SOURCES) : $(HFILES)
 # This rule links in binary data with the .jpg extension
 #---------------------------------------------------------------------------------
 %.jpg.o %_jpg.h : %.jpg
-#---------------------------------------------------------------------------------
 	@echo $(notdir $<)
 	$(bin2o)
 

@@ -1,6 +1,6 @@
-#ifndef USBSUBMENU_H
-#define USBSUBMENU_H
+#ifndef USB_SUBMENU_H
+#define USB_SUBMENU_H
 
-void abrirUSBsubmenu();
+void abrirUSBsubmenu(void);
 
 #endif
