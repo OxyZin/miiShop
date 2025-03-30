@@ -7,7 +7,8 @@
 #include <stdlib.h>
 
 #define limparTela() printf("\x1b[2J")
-#define MAX_TEMAS 10
+#define MAX_TEMAS 20
+#define VISIBLE_ITEMS 10  // Number of items visible at once
 
 typedef struct {
     char *nome;
@@ -34,14 +35,14 @@ static char* lerArquivo(const char* caminho) {
 void abrirWIIsubmenu() {
     limparTela();
     if (!fatInitDefault()) {
-        printf("ERRO: fatInitDefault() falhou\n");
+        printf("ERROR: fatInitDefault() failed\n");
         goto esperar;
     }
     
     const char *caminho = "sd:/apps/miiShop/themes/wii.json";
     char *json_str = lerArquivo(caminho);
     if (!json_str) {
-        printf("ERRO: Não foi possível ler wii.json\n");
+        printf("ERROR: Could not read wii.json\n");
         goto esperar;
     }
     
@@ -89,32 +90,46 @@ void abrirWIIsubmenu() {
     }
     
     if (num_temas == 0) {
-        printf("ERRO: Nenhum tema encontrado no JSON\n");
+        printf("ERROR: No theme found in JSON\n");
         free(json_str);
         goto esperar;
     }
     
     int opcao = 0;
+    int scroll_offset = 0;  // Starting position of visible items
+    
     while (1) {
         limparTela();
         printf("=== Wii Menu Themes ===\n\n");
         
-        for (int i = 0; i < num_temas; i++) {
+        // Calculate the visible range
+        int start = scroll_offset;
+        int end = start + VISIBLE_ITEMS;
+        if (end > num_temas) end = num_temas;
+        
+        // Show scroll indicators
+        if (scroll_offset > 0) printf("  More items above\n");
+        
+        // Display visible items
+        for (int i = start; i < end; i++) {
             printf("%s %s\n", (opcao == i) ? ">>" : "  ", temas[i].nome);
         }
         
-        printf("\nPressione A para detalhes, B para voltar...\n");
+        if (end < num_temas) printf("  More items below\n");
+        
+        printf("\nPress A for details, B to go back...\n");
+        printf("Use UP/DOWN to scroll and select\n");
         
         WPAD_ScanPads();
         u32 pressed = WPAD_ButtonsDown(0);
         
         if (pressed & WPAD_BUTTON_A) {
             limparTela();
-            printf("Detalhes do Tema:\n\n");
-            printf("Nome: %s\n", temas[opcao].nome);
-            printf("Descrição: %s\n", temas[opcao].descricao);
+            printf("Theme Details:\n\n");
+            printf("Name: %s\n", temas[opcao].nome);
+            printf("Description: %s\n", temas[opcao].descricao);
             printf("Download: %s\n", temas[opcao].url);
-            printf("\nPressione B para voltar...\n");
+            printf("\nPress B to go back...\n");
             
             while (1) {
                 WPAD_ScanPads();
@@ -124,8 +139,24 @@ void abrirWIIsubmenu() {
         }
         
         if (pressed & WPAD_BUTTON_B) break;
-        if (pressed & WPAD_BUTTON_DOWN) opcao = (opcao + 1) % num_temas;
-        if (pressed & WPAD_BUTTON_UP) opcao = (opcao - 1 + num_temas) % num_temas;
+        
+        if (pressed & WPAD_BUTTON_DOWN) {
+            if (opcao < num_temas - 1) {
+                opcao++;
+                if (opcao >= scroll_offset + VISIBLE_ITEMS) {
+                    scroll_offset++;
+                }
+            }
+        }
+        
+        if (pressed & WPAD_BUTTON_UP) {
+            if (opcao > 0) {
+                opcao--;
+                if (opcao < scroll_offset) {
+                    scroll_offset--;
+                }
+            }
+        }
         
         VIDEO_WaitVSync();
     }
@@ -138,7 +169,7 @@ void abrirWIIsubmenu() {
     free(json_str);
 
 esperar:
-    printf("\nPressione B para sair...\n");
+    printf("\nPress B to exit...\n");
     while (1) {
         WPAD_ScanPads();
         if (WPAD_ButtonsDown(0) & WPAD_BUTTON_B) break;
