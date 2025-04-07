@@ -11,6 +11,7 @@ typedef struct {
     GRRLIB_texImg *image;
     bool is_hovering;
     bool is_pressed;
+    void (*callback)(); // Ponteiro para a função a ser chamada ao clicar
 } Button;
 
 #ifdef __cplusplus
