@@ -1,0 +1,11 @@
+{
+    "files.associations": {
+        "wpad.h": "c",
+        "stdio.h": "c",
+        "string.h": "c",
+        "usbsubmenu.h": "c",
+        "gui.h": "c",
+        "grrlib.h": "c"
+    },
+    "C_Cpp.errorSquiggles": "disabled"
+}
