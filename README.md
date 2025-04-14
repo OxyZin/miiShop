@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/OxyZin/miiShopDatabase/refs/heads/main/miishop.png" alt="miiShop">
+  <img src="https://raw.githubusercontent.com/OxyZin/miiShopDatabase/refs/heads/main/miiShop.png" alt="miiShop">
 </p>
 
 <p align='center'>
