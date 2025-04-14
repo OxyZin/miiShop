@@ -5,5 +5,6 @@
 
 void InitDebug();
 void DrawDebugInfo();
+void ToggleDebugVisibility();
 
 #endif

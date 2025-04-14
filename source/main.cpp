@@ -41,7 +41,10 @@ int main() {
     background = GRRLIB_LoadTexturePNG(bg_png);
 
     GRRLIB_SetMidHandle(cursor, true);
-
+    if (WPAD_ButtonsDown(WPAD_CHAN_0) & WPAD_BUTTON_2) {
+        ToggleDebugVisibility();
+    }
+    
     Button buttons[3] = {
         {50, 130, 1.0f, 0xFFFFFFFF, btn_theme, false, false, ShowThemesGallery},
         {50, 190, 1.0f, 0xFFFFFFFF, btn_downloads, false, false, NULL},
@@ -100,7 +103,7 @@ int main() {
         }
 
         if (ir.valid) {
-            GRRLIB_DrawImg(pointer_x, pointer_y, cursor, 0, 1, 1, 0xFFFFFFFF);
+            GRRLIB_DrawImg(pointer_x, pointer_y, cursor, ir.angle, 1, 1, 0xFFFFFFFF);
         }
 
         DrawDebugInfo();

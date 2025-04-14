@@ -40,6 +40,10 @@ void ShowThemesGallery() {
     InitDebug();
 
     GRRLIB_SetMidHandle(cursor, true);
+    if (WPAD_ButtonsDown(WPAD_CHAN_0) & WPAD_BUTTON_2) {
+        ToggleDebugVisibility();
+    }
+    
 
     float scale = 1.0f;
     int button_width = 120 * scale;
@@ -101,7 +105,7 @@ void ShowThemesGallery() {
         }
 
         if (ir.valid) {
-            GRRLIB_DrawImg(pointer_x, pointer_y, cursor, 0, 1, 1, 0xFFFFFFFF);
+            GRRLIB_DrawImg(pointer_x, pointer_y, cursor, ir.angle, 1, 1, 0xFFFFFFFF);
         }
 
         DrawDebugInfo();

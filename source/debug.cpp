@@ -12,8 +12,8 @@ static GRRLIB_ttfFont *font = NULL;
 static u64 lastTime = 0;
 static int fps = 0;
 static int frameCount = 0;
+static bool debugVisible = true;
 
-// Conversão manual de ticks para milissegundos
 u64 GetMillisecs() {
     return gettime() / 60750;
 }
@@ -23,7 +23,13 @@ void InitDebug() {
     lastTime = GetMillisecs();
 }
 
+void ToggleDebugVisibility() {
+    debugVisible = !debugVisible;
+}
+
 void DrawDebugInfo() {
+    if (!debugVisible) return;
+
     u64 currentTime = GetMillisecs();
     frameCount++;
 
