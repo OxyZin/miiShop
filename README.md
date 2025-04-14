@@ -11,11 +11,11 @@
 
 
 ## About  
-**miiShop** is a project inspired by hShop but developed for the Nintendo Wii. It allows direct file downloads on the console, making it easier to install additional content.  
+**miiShop** is a project inspired by hShop but developed for the Nintendo Wii. It allows direct theme downloads on the console.
 
 ## Features  
 - Direct download to the Wii  
-- Support for different file categories  
+- Support for different theme categories  
 - Simple and intuitive interface  
 
 ## How to Use  
