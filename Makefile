@@ -9,6 +9,9 @@ endif
 
 include $(DEVKITPPC)/wii_rules
 
+# Check if pkg-config is available
+PKGCONFIG = $(shell command -v powerpc-eabi-pkg-config --version 2>/dev/null)
+
 #---------------------------------------------------------------------------------
 # TARGET is the name of the output
 # BUILD is the directory where object files & intermediate files will be placed
@@ -19,26 +22,38 @@ TARGET		:=	$(notdir $(CURDIR))
 BUILD		:=	build
 SOURCES		:=	source
 DATA		:=	data
-INCLUDES := libs/wiinyl/include
+INCLUDES	:=
+
 #---------------------------------------------------------------------------------
 # options for code generation
 #---------------------------------------------------------------------------------
 
-CFLAGS	= -g -O2 -Wall $(MACHDEP) $(INCLUDE)
-CXXFLAGS	=	$(CFLAGS)
+ifeq ($(strip $(PKGCONFIG)),)
+CFLAGS	= -O3 -Wall -Wextra $(MACHDEP) $(INCLUDE)
+else
+CFLAGS	= `powerpc-eabi-pkg-config libcurl mbedtls --cflags` -O3 -Wall -Wextra $(MACHDEP) $(INCLUDE)
+endif
+
+CXXFLAGS	:=	$(CFLAGS)
 
 LDFLAGS	=	-g $(MACHDEP) -Wl,-Map,$(notdir $@).map
 
 #---------------------------------------------------------------------------------
 # any extra libraries we wish to link with the project
 #---------------------------------------------------------------------------------
-LIBS := -lgrrlib -lpngu `$(PREFIX)pkg-config freetype2 libpng libjpeg --libs` -lfat -lwiiuse -lbte -lasnd -lmad -logc -lm -lvorbisidec -logg
+
+ifeq ($(strip $(PKGCONFIG)),)
+LIBS	:=	-lcurl -lz -lmbedtls -lmbedcrypto -lmbedx509 -lwiisocket -logc -lm
+else
+LIBS	:=	`powerpc-eabi-pkg-config libcurl mbedtls --libs` -logc
+endif
+LIBS    :=  -lwiiuse -lbte -logc -lm
 
 #---------------------------------------------------------------------------------
 # list of directories containing libraries, this must be the top level containing
 # include and lib
 #---------------------------------------------------------------------------------
-LIBDIRS := $(CURDIR)/$(GRRLIB) $(PORTLIBS) $(CURDIR)/libs/wiinyl
+LIBDIRS	:= $(PORTLIBS)
 
 #---------------------------------------------------------------------------------
 # no real need to edit anything past this point unless you need to add additional
@@ -61,8 +76,7 @@ CFILES		:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.c)))
 CPPFILES	:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.cpp)))
 sFILES		:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.s)))
 SFILES		:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.S)))
-BINFILES := $(foreach dir,$(DATA),$(notdir $(wildcard $(dir)/*.png $(dir)/*.jpg $(dir)/*.wav $(dir)/*.ogg $(dir)/*.ttf)))
-
+BINFILES	:=	$(foreach dir,$(DATA),$(notdir $(wildcard $(dir)/*.*)))
 
 #---------------------------------------------------------------------------------
 # use CXX for linking C++ projects, CC for standard C
@@ -106,7 +120,7 @@ clean:
 	@rm -fr $(BUILD) $(OUTPUT).elf $(OUTPUT).dol
 
 #---------------------------------------------------------------------------------
-load:
+run:
 	wiiload $(TARGET).dol
 
 
@@ -123,46 +137,8 @@ $(OUTPUT).elf: $(OFILES)
 
 $(OFILES_SOURCES) : $(HFILES)
 
-#---------------------------------------------------------------------------------
-# This rule links in binary data with the .jpg extension
-#---------------------------------------------------------------------------------
-%.jpg.o	:	%.jpg
-#---------------------------------------------------------------------------------
-	@echo $(notdir $<)
-	$(bin2o)
-
-#---------------------------------------------------------------------------------
-# This rule links in binary data with the .png extension
-#---------------------------------------------------------------------------------
-%.png.o	:	%.png
-#---------------------------------------------------------------------------------
-	@echo $(notdir $<)
-	$(bin2o)
-
-#---------------------------------------------------------------------------------
-# This rule links in binary data with the .ttf extension
-#---------------------------------------------------------------------------------
-#---------------------------------------------------------------------------------
-# This rule links in binary data with the .ogg extension
-#---------------------------------------------------------------------------------
-%.ogg.o	:	%.ogg
-#---------------------------------------------------------------------------------
-	@echo $(notdir $<)
-	$(bin2o)
-
-#---------------------------------------------------------------------------------
-# This rule links in binary data with the .ogg extension
-#---------------------------------------------------------------------------------
-%.wav.o	:	%.wav
-#---------------------------------------------------------------------------------
-	@echo $(notdir $<)
-	$(bin2o)
-
-#---------------------------------------------------------------------------------
-# This rule links in binary data with the .ttf extension
-#---------------------------------------------------------------------------------
-%.ttf.o	:	%.ttf
-#---------------------------------------------------------------------------------
+# Embed pem files
+%.pem.o %_pem.h: %.pem
 	@echo $(notdir $<)
 	$(bin2o)
 
