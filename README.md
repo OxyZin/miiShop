@@ -7,8 +7,3 @@ To use MiiShop you can either
   > [!WARNING]
   > This app does NOT install the themes you download. YOU must install them yourself.
  - Download the themes directly from the <a href="https://miishop.psogc.tk/">here</a>
-## To Do
-- [X] Display the themes
-- [X] Get it to download the themes
-- [X] Fix minor bugs
-- [ ] (maybe) Add a GUI
