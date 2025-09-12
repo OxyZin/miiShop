@@ -27,7 +27,8 @@ INCLUDES	:=	include
 
 #CFLAGS	= -g -O2 -Wall -Wno-comment $(MACHDEP) $(INCLUDE)
 #CFLAGS	= -g -Wall -Wno-comment $(MACHDEP) $(INCLUDE)
-CFLAGS = -O2 -Wall -Wno-comment $(MACHDEP) $(INCLUDE)
+#CFLAGS = -O2 -Wall -Wno-comment $(MACHDEP) $(INCLUDE)
+CFLAGS = -Wall -Wno-comment $(MACHDEP) $(INCLUDE)
 CXXFLAGS	=	$(CFLAGS)
 
 #LDFLAGS	=	-g $(MACHDEP) -Wl,-Map,$(notdir $@).map
