@@ -40,6 +40,7 @@ struct FileStruct {
 
 typedef struct {
     char id[16];
+    char author[255];
     char name[128];
     char description[256];
 } Theme;
@@ -420,11 +421,13 @@ int get_themes(const char* platform, int page) {
         cJSON_ArrayForEach(theme_item, items_array) {
             cJSON* id_json = cJSON_GetObjectItemCaseSensitive(theme_item, "id");
             cJSON* name_json = cJSON_GetObjectItemCaseSensitive(theme_item, "name");
+            cJSON* author_json = cJSON_GetObjectItemCaseSensitive(theme_item, "author");
             cJSON* desc_json = cJSON_GetObjectItemCaseSensitive(theme_item, "description");
 
             if (cJSON_IsString(id_json) && cJSON_IsString(name_json) && cJSON_IsString(desc_json)) {
                 strncpy(state.themes[i].id, id_json->valuestring, sizeof(state.themes[i].id) - 1);
                 strncpy(state.themes[i].name, name_json->valuestring, sizeof(state.themes[i].name) - 1);
+                strncpy(state.themes[i].author, author_json->valuestring, sizeof(state.themes[i].author) - 1);
                 strncpy(state.themes[i].description, desc_json->valuestring, sizeof(state.themes[i].description) - 1);
                 i++;
             }
@@ -493,7 +496,7 @@ void pr_sel_theme_inf() {
     printf("--- Theme Details ---\n\n");
     Theme selected = state.themes[state.sel_ind];
     printf("  Name: %s\n", selected.name);
-    printf("  ID:   %s\n", selected.id);
+    printf("  Author: %s\n", selected.author);
     printf("  Desc: %s\n\n", selected.description);
     printf("------------------------------------------\n");
     printf("  [A] Download | [B] Back\n");
@@ -507,7 +510,7 @@ void pr_gal_view() {
         printf("No themes found or failed to load.\n\n");
     } else {
         for (int i = 0; i < state.theme_count; i++) {
-            printf("%s %s\n", (i == state.sel_ind) ? ">>" : "  ", state.themes[i].name);
+            printf("%s %s made by %s\n", (i == state.sel_ind) ? ">>" : "  ", state.themes[i].name, state.themes[i].author);
         }
     }
     printf("\n-------------------------------------------------------------------------\n");
