@@ -4,13 +4,10 @@
 .SUFFIXES:
 #---------------------------------------------------------------------------------
 ifeq ($(strip $(DEVKITPPC)),)
-$(error "Please set DEVKITPPC in your environment. export DEVKITPPC=<path to>devkitPPC")
+$(error "Please set DEVKITPPC in your environment. export DEVKITPPC=<path to>devkitPPC)
 endif
 
 include $(DEVKITPPC)/wii_rules
-
-# Check if pkg-config is available
-PKGCONFIG = $(shell command -v powerpc-eabi-pkg-config --version 2>/dev/null)
 
 #---------------------------------------------------------------------------------
 # TARGET is the name of the output
@@ -21,39 +18,31 @@ PKGCONFIG = $(shell command -v powerpc-eabi-pkg-config --version 2>/dev/null)
 TARGET		:=	$(notdir $(CURDIR))
 BUILD		:=	build
 SOURCES		:=	source
-DATA		:=	data
-INCLUDES	:=
+DATA		:=	data  
+INCLUDES	:=	include
 
 #---------------------------------------------------------------------------------
 # options for code generation
 #---------------------------------------------------------------------------------
 
-ifeq ($(strip $(PKGCONFIG)),)
-CFLAGS	= -O3 -Wall -Wextra $(MACHDEP) $(INCLUDE)
-else
-CFLAGS	= `powerpc-eabi-pkg-config libcurl mbedtls --cflags` -O3 -Wall -Wextra $(MACHDEP) $(INCLUDE)
-endif
+#CFLAGS	= -g -O2 -Wall -Wno-comment $(MACHDEP) $(INCLUDE)
+#CFLAGS	= -g -Wall -Wno-comment $(MACHDEP) $(INCLUDE)
+#CFLAGS = -O2 -Wall -Wno-comment $(MACHDEP) $(INCLUDE)
+CFLAGS = -Wall -Wno-comment $(MACHDEP) $(INCLUDE)
+CXXFLAGS	=	$(CFLAGS)
 
-CXXFLAGS	:=	$(CFLAGS)
-
-LDFLAGS	=	-g $(MACHDEP) -Wl,-Map,$(notdir $@).map
+#LDFLAGS	=	-g $(MACHDEP) -Wl,-Map,$(notdir $@).map
+LDFLAGS	=	$(MACHDEP) -Wl,-Map,$(notdir $@).map
 
 #---------------------------------------------------------------------------------
-# any extra libraries we wish to link with the project
+# any extra libraries we wish to link with the project  
 #---------------------------------------------------------------------------------
-
-ifeq ($(strip $(PKGCONFIG)),)
-LIBS	:=	-lcurl -lz -lmbedtls -lmbedcrypto -lmbedx509 -lwiisocket -logc -lm
-else
-LIBS	:=	`powerpc-eabi-pkg-config libcurl mbedtls --libs` -logc
-endif
-LIBS    :=  -lwiiuse -lbte -logc -lm
-
+LIBS    :=    -lcurl -lwiisocket -lmbedtls -lmbedcrypto -lmbedx509 -lwiiuse -lfat -lz -lbte -logc -lm
 #---------------------------------------------------------------------------------
 # list of directories containing libraries, this must be the top level containing
 # include and lib
 #---------------------------------------------------------------------------------
-LIBDIRS	:= $(PORTLIBS)
+LIBDIRS	:=  $(PORTLIBS)
 
 #---------------------------------------------------------------------------------
 # no real need to edit anything past this point unless you need to add additional
@@ -87,16 +76,14 @@ else
 	export LD	:=	$(CXX)
 endif
 
-export OFILES_BIN	:=	$(addsuffix .o,$(BINFILES))
-export OFILES_SOURCES := $(CPPFILES:.cpp=.o) $(CFILES:.c=.o) $(sFILES:.s=.o) $(SFILES:.S=.o)
-export OFILES := $(OFILES_BIN) $(OFILES_SOURCES)
-
-export HFILES := $(addsuffix .h,$(subst .,_,$(BINFILES)))
+export OFILES	:=	$(addsuffix .o,$(BINFILES)) \
+					$(CPPFILES:.cpp=.o) $(CFILES:.c=.o) \
+					$(sFILES:.s=.o) $(SFILES:.S=.o)
 
 #---------------------------------------------------------------------------------
 # build a list of include paths
 #---------------------------------------------------------------------------------
-export INCLUDE	:=	$(foreach dir,$(INCLUDES), -iquote $(CURDIR)/$(dir)) \
+export INCLUDE	:=	$(foreach dir,$(INCLUDES),-I$(CURDIR)/$(dir)) \
 					$(foreach dir,$(LIBDIRS),-I$(dir)/include) \
 					-I$(CURDIR)/$(BUILD) \
 					-I$(LIBOGC_INC)
@@ -104,7 +91,8 @@ export INCLUDE	:=	$(foreach dir,$(INCLUDES), -iquote $(CURDIR)/$(dir)) \
 #---------------------------------------------------------------------------------
 # build a list of library paths
 #---------------------------------------------------------------------------------
-export LIBPATHS	:= -L$(LIBOGC_LIB) $(foreach dir,$(LIBDIRS),-L$(dir)/lib)
+export LIBPATHS	:=	$(foreach dir,$(LIBDIRS),-L$(dir)/lib) \
+					-L$(LIBOGC_LIB)
 
 export OUTPUT	:=	$(CURDIR)/$(TARGET)
 .PHONY: $(BUILD) clean
@@ -112,16 +100,25 @@ export OUTPUT	:=	$(CURDIR)/$(TARGET)
 #---------------------------------------------------------------------------------
 $(BUILD):
 	@[ -d $@ ] || mkdir -p $@
-	@$(MAKE) --no-print-directory -C $(BUILD) -f $(CURDIR)/Makefile
+	@make --no-print-directory -C $(BUILD) -f $(CURDIR)/Makefile
 
 #---------------------------------------------------------------------------------
 clean:
-	@echo clean ...
+	@echo Cleanup...
 	@rm -fr $(BUILD) $(OUTPUT).elf $(OUTPUT).dol
+cleanm:
+	@echo Cleanup...
+	@rm -fr $(BUILD) $(OUTPUT).elf $(OUTPUT).dol
+	$(MAKE)
+
 
 #---------------------------------------------------------------------------------
 run:
-	wiiload $(TARGET).dol
+	wiiload $(TARGET).elf
+
+#---------------------------------------------------------------------------------
+reload:
+	psoload -r $(TARGET).dol
 
 
 #---------------------------------------------------------------------------------
@@ -135,12 +132,32 @@ DEPENDS	:=	$(OFILES:.o=.d)
 $(OUTPUT).dol: $(OUTPUT).elf
 $(OUTPUT).elf: $(OFILES)
 
-$(OFILES_SOURCES) : $(HFILES)
-
-# Embed pem files
-%.pem.o %_pem.h: %.pem
+#---------------------------------------------------------------------------------
+# This rule links in binary data with the .jpg extension
+#---------------------------------------------------------------------------------
+%.jpg.o	:	%.jpg
+#---------------------------------------------------------------------------------
 	@echo $(notdir $<)
 	$(bin2o)
+
+%.elf.o	:	%.elf
+	@echo $(notdir $<)
+	$(bin2o)
+
+-include $(DEPENDS)
+
+#---------------------------------------------------------------------------------
+# This rule links in binary data
+#---------------------------------------------------------------------------------
+%.bin.o	:	%.bin
+#---------------------------------------------------------------------------------
+	@echo $(notdir $<)
+	@$(bin2o)
+
+%.mod.o	:	%.mod
+#---------------------------------------------------------------------------------
+	@echo $(notdir $<)
+	@$(bin2o)
 
 -include $(DEPENDS)
 
